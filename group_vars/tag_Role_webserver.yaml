@@ -16,7 +16,7 @@ githubpassword: !vault |
           3038
 
 # logicdesk_repo: "git@github.com:MatthewFox97/thelogicdesk.git"
-logicdesk_repo: "github.com/MatthewFox97/thelogicdesk.git"
+logicdesk_repo: "github.com/MatthewFox97/thelogicdesk-frontend.git"
 logicdesk_root_dir: /var/www/html/logicdesk/
 
 apache_vhosts_filename: "thelogicdesk.conf"

@@ -18,8 +18,7 @@
   git:
     repo: "https://{{ githubuser | urlencode }}:{{ githubpassword | urlencode }}@{{ logicdesk_repo }}"
     dest: "{{logicdesk_root_dir}}"
-    version: "re-build"
-    update: no
+    update: yes
 
 # PHP requires specific permissions on files and directories
 - name: Register all directories downloaded
