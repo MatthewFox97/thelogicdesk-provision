@@ -1,0 +1,90 @@
+---
+
+githubuser: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          61653963353632373237373838633163306439393463306534393564643035383861616634626437
+          3161643536666132333537343938343033623939613030320a663538653539386634333061383935
+          36613431613162326162393266333336313733386365363864383738393139336464636635306161
+          6337333963383333390a366361353631376466396638346432653834396234363339636466623562
+          3239
+githubpassword: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          33363533346566393239636332376336346132613337326662316137643461316432316337313839
+          6431336563323166306136343538326532376630323738640a303463646134353534376362383963
+          32663933626138616263386437663462613931303633343665656637663433346232323938366235
+          3937663535373337360a626334666638326633353964346137326364623364323530326266353431
+          3038
+
+# logicdesk_repo: "git@github.com:MatthewFox97/thelogicdesk.git"
+logicdesk_repo: "github.com/MatthewFox97/thelogicdesk.git"
+logicdesk_root_dir: /var/www/html/logicdesk/
+
+apache_vhosts_filename: "thelogicdesk.conf"
+apache_vhosts_template: "vhosts.conf.j2"
+
+apache_packages:
+  - apache2
+  - apache2-utils
+
+apache_mods_enabled:
+  - ssl.load
+
+apache_listen_ip: "*"
+apache_listen_port: 8080
+
+apache_create_vhosts: true
+apache_remove_default_vhost: true
+
+apache_global_vhost_settings: |
+  DirectoryIndex index.php index.html
+
+apache_ports_configuration_items:
+  - regexp: "^Listen "
+    line: "Listen {{ apache_listen_port }}"
+
+apache_vhosts_version: "2.4"
+apache_default_vhost_filename: 000-default.conf
+
+apache_vhosts:
+  # Redirect non www traffic to real site
+  - servername: "{{ domain }}"
+    extra_parameters: |
+        RedirectMatch permanent ^/(.*) http://www.{{ domain }}/$1
+  
+  # real site host
+  - servername: "www.{{ domain }}"
+    serveradmin: "webmaster@localhost"
+    documentroot: "{{logicdesk_root_dir}}"
+    extra_parameters: |
+        ErrorLog /var/log/apache2/thelogicdesk.error.log
+        CustomLog /var/log/apache2/thelogicdesk.access.log combined
+  
+
+php_packages:
+  - php7.2 
+  - libapache2-mod-php7.2 
+  - php7.2-mysql
+
+php_ini_config:
+  - regexp: "error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT"
+    line: "error_reporting = E_COMPILE_ERROR | E_RECOVERABLE_ERROR | E_ERROR | E_CORE_ERROR"
+  - regexp: "max_input_time = 60"
+    line: "max_input_time = 30"
+  - regexp: ";error_log = syslog"
+    line: "error_log = /var/log/apache2/php.error.log"
+
+db_connection_settings:
+  - regexp: \$servername = (.*)
+    line: "$servername = \"{{ db_hostname }}\";"
+  - regexp: \$username = (.*)
+    line: "$username = \"{{ db_admin_user }}\";"
+  - regexp: \$password = (.*)
+    line: "$password = \"{{ db_admin_password }}\";"
+  - regexp: \$dbname = (.*)
+    line: "$dbname = \"{{ db_name }}\";"
+    
+
+
+
+  
+  

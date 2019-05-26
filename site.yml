@@ -1,0 +1,18 @@
+---
+
+  - name: Install Apache on Webservers
+    hosts:
+      - tag_Role_webserver
+    become: true
+    roles:
+      - { role: common, tags: 'base' }
+      - { role: packages, tags: 'packages' }
+      - { role: apache, tags: 'webserver' }
+      - { role: php, tags: 'webserver' }
+
+  - name: Setup MySQL database on RDS
+    hosts:
+      - tag_Role_database
+    gather_facts: false
+    roles:
+      - { role: mysql, tags: 'database' }

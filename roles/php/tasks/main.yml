@@ -1,0 +1,34 @@
+---
+- name: Run apt-get update
+  apt:
+    update_cache: yes
+
+- name: Install PHP packages for apache2
+  apt:
+    name: "software-properties-common"
+    state: present
+    
+- name: Add php 7.2 repo
+  apt_repository:
+    repo: ppa:ondrej/php
+    state: present
+
+- name: Run apt-get update
+  apt:
+    update_cache: yes
+
+- name: Install PHP packages for apache2
+  apt:
+    name: "{{ php_packages }}" 
+    state: present
+  notify: reload apache
+
+- name: configure php.ini file
+  lineinfile:
+    dest: "/etc/php/7.2/apache2/php.ini"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+    backrefs: yes
+  with_items: "{{ php_ini_config }}"
+  notify: reload apache

@@ -1,0 +1,67 @@
+
+
+- name: This block is used for local configuration of Vagrant only
+  block:   
+
+    - name: Create database on Vagrant host
+      mysql_db:
+        login_host: "{{ db_hostname }}"
+        login_user: "{{ db_admin_user }}"
+        login_password: "{{ db_admin_password }}"
+        login_port: "{{ db_port }}"
+        name: "{{ db_name }}"
+        state: present
+      no_log: True
+
+    - name: Copy Schema file to server
+      copy:
+        src: schema.sql
+        dest: /tmp/schema.sql
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Run SQL commands against DB to create schema
+      mysql_db:
+        login_host: "{{ db_hostname }}"
+        login_user: "{{ db_admin_user }}"
+        login_password: "{{ db_admin_password }}"
+        login_port: "{{ db_port }}"
+        name: "{{ db_name }}"
+        state: import
+        target: "/tmp/schema.sql"
+      no_log: True
+
+  when: db_hostname == "10.10.30.2"
+  become: true
+
+- name: This block is used for LIVE Environment configuration
+  block:    
+  
+    - name: Create database on RDS host
+      local_action:
+        module: mysql_db
+        login_host: "{{ db_hostname }}"
+        login_user: "{{ db_admin_user }}"
+        login_password: "{{ db_admin_password }}"
+        login_port: "{{ db_port }}"
+        name: "{{ db_name }}"
+        state: present
+      no_log: True
+      
+    - name: Run SQL commands against RDS DB to create schema
+      local_action:
+        module: mysql_db
+        login_host: "{{ db_hostname }}"
+        login_user: "{{ db_admin_user }}"
+        login_password: "{{ db_admin_password }}"
+        login_port: "{{ db_port }}"
+        name: "{{ db_name }}"
+        state: import
+        target: "{{ role_path }}/files/schema.sql"
+
+    # - name: Run SQL commands against RDS DB to create schema
+    #   local_action:
+    #     module: command mysql -u {{ db_admin_user }} -h {{ db_hostname }} --password={{ db_admin_password }} thelogicdeskdb < schema.sql
+
+  when: db_hostname != "10.10.30.2"

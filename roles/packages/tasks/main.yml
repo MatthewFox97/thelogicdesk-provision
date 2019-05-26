@@ -1,0 +1,11 @@
+---
+# tasks file for installing common & custom packages
+
+- name: common package installs
+  package:
+    name: "{{ common_package_installs }}"
+    state: "present"
+- name: custom package installs
+  package:
+    name: "{{ custom_package_installs }}"
+    state: "present"
